@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="jquery-1.9.1.min.js"></script>
+  <script src="jquery.eNestedSortable.js"></script>
+  <style type="text/css">
+    .e-nested-sortable-placeholder {
+      border: 1px dashed lightblue;
+    }
+    .e-nested-sortable-placeholder-error {
+      border-color: red;
+    }
+  </style>
+</head>
+<body>
+  <ol class="sortable">
+    <li>Item 1
+      <ol>
+        <li>Item 1.1</li>
+        <li>Item 1.2
+          <ol>
+            <li>Item 1.2.1</li>
+            <li>Item 1.2.2</li>
+            <li>Item 1.2.3</li>
+            <li>Item 1.2.4</li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li>Item 2
+      <ol></ol>
+    </li>
+    <li>Item 3
+      <ol>
+        <li>Item 3.1</li>
+        <li>Item 3.2</li>
+      </ol>
+    </li>
+    <li>Item 4</li>
+  </ol>
+</body>
+<script type="text/javascript">
+  $(".sortable").eNestedSortable()
+  .on("drop", function(e, data){
+    data.element = data.element.text().substring(0, 10);
+    data.parent = data.parent.parents("li").first().text().substring(0, 10);
+    data.firstParent = data.firstParent.parents("li").first().text().substring(0, 10);
+    console.log(data);
+  })
+  .on("move", function(e, data){
+    data.element = data.element.text().substring(0, 10);
+    data.parent = data.parent.parents("li").first().text().substring(0, 10);
+    console.log(data);
+  });
+</script>
+</html>
