@@ -90,6 +90,10 @@ This is the style of placeholder element. Can be changed if need.
 
 jQuery 1.4+
 
+## Notes
+
+* If the list is created dynamically, the `ul` or `ol` should have the class `e-nested-sortable-ul` and the `li`, the class `e-nested-sortable-li`.
+
 ## Examples
 
 ### Move element
