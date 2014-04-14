@@ -41,17 +41,17 @@
   </ol>
 </body>
 <script type="text/javascript">
-  $(".sortable").eNestedSortable()
-  .on("drop", function(e, data){
-    data.element = data.element.text().substring(0, 10);
-    data.parent = data.parent.parents("li").first().text().substring(0, 10);
-    data.firstParent = data.firstParent.parents("li").first().text().substring(0, 10);
-    console.log(data);
-  })
-  .on("move", function(e, data){
-    data.element = data.element.text().substring(0, 10);
-    data.parent = data.parent.parents("li").first().text().substring(0, 10);
-    console.log(data);
+  $(document).ready(function(){
+    $(".sortable").eNestedSortable()
+    .on("drag", function(e, data){
+      console.log(data.element, data.parent, data.index);
+    })
+    .on("move", function(e, data){
+      console.log(data.element, data.parent, data.index);
+    })
+    .on("drop", function(e, data){
+      console.log(data.element, data.newParent, data.newIndex, data.oldParent, data.oldIndex);
+    });
   });
 </script>
 </html>

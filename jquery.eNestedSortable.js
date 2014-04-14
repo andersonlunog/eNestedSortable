@@ -57,8 +57,8 @@
       _this.isHandle = true;
       _this.mouseStart = {x: e.pageX, y: e.pageY};
       _this.offsetStart = _this.dragEl.offset();
-      _this.index = _this.firstIndex = _this.dragEl.index();
-      _this.parent = _this.firstParent = _this.dragEl.closest(_this.ulSelector);
+      _this.index = _this.oldIndex = _this.dragEl.index();
+      _this.parent = _this.oldParent = _this.dragEl.closest(_this.ulSelector);
       attachPlaceHolder(_this.index, _this.parent, _this.dragEl.outerHeight());
 
       _this.dragEl.offset(_this.offsetStart);
@@ -113,7 +113,7 @@
       _this.placeholder.detach();
       attachPlaceHolder(hoverIndex, hoverParent);
 
-      _this.fixIndex = hoverParent[0] == _this.firstParent[0] && hoverIndex > _this.firstIndex ? 1 : 0; //Fix diff index caused by placeholder element
+      _this.fixIndex = hoverParent[0] == _this.oldParent[0] && hoverIndex > _this.oldIndex ? 1 : 0; //Fix diff index caused by placeholder element
 
       var retObj = {
         element: _this.dragEl,
@@ -158,8 +158,8 @@
     var onDrop = function(){
       cancel();
       _this.index -= _this.fixIndex;
-      if((_this.parent[0] != _this.firstParent[0] || _this.index != _this.firstIndex) && _this.isValid)
-        _this.el.trigger("drop", {element: _this.dragEl, parent: _this.parent, index: _this.index, firstParent: _this.firstParent, firstIndex: _this.firstIndex});
+      if((_this.parent[0] != _this.oldParent[0] || _this.index != _this.oldIndex) && _this.isValid)
+        _this.el.trigger("drop", {element: _this.dragEl, newParent: _this.parent, newIndex: _this.index, oldParent: _this.oldParent, oldIndex: _this.oldIndex});
     };
 
     var cancel = function(){
