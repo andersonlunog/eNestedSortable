@@ -1,6 +1,6 @@
 /*
  * jQuery Evented Nested Sortable
- * v 0.0.4 / 2014-04-11
+ * v 0.0.5 / 2014-04-11
  * https://github.com/andersonlevita/eNestedSortable
  *
  * Copyright (c) 2014-2014 Anderson Nogueira
@@ -180,7 +180,7 @@
     drop: function(){
       this.detachPlaceholder();
       this.index -= this.fixIndex;
-      if((this.parent[0] != this.oldParent[0] || this.index != this.oldIndex) && this.isValid)
+      if(this.dragEl != null && this.parent != null && (this.parent[0] != this.oldParent[0] || this.index != this.oldIndex) && this.isValid)
         this.el.trigger("drop", {element: this.dragEl, newParent: this.parent, newIndex: this.index, oldParent: this.oldParent, oldIndex: this.oldIndex});
       this.reset();
     },
