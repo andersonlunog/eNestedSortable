@@ -1,6 +1,6 @@
 /*
  * jQuery Evented Nested Sortable
- * v 0.0.3 / 2014-04-11
+ * v 0.0.4 / 2014-04-11
  * https://github.com/andersonlevita/eNestedSortable
  *
  * Copyright (c) 2014-2014 Anderson Nogueira
@@ -73,7 +73,7 @@
       e.preventDefault();
       e.stopPropagation();
       this.reset();
-      this.dragEl = $(e.target);
+      this.dragEl = $(e.target).closest(this.options.liSelector);
       this.firstStyle = this.dragEl.attr("style") || "";
       this.dragEl.css({"position": "absolute", "opacity": this.options.opacity, "z-index": "-1"});
       this.isHandle = true;
