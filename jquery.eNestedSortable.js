@@ -18,7 +18,6 @@
   };
 
   function Plugin(el, options){
-
     this.options = $.extend({}, defaults, options);
     this.el = $(el);
     this.ulClass = "e-nested-sortable-ul";
@@ -29,186 +28,204 @@
     this.init();
   }
 
-  Plugin.prototype = {
-
-    init: function(){
-      this.isHandle = false;
-      this.isValid = true;
-      this.mouseStart = {x: 0, y: 0};
-      this.offsetStart = {left: 0, top: 0};
-      this.fixIndex = 0;
-      var _this = this;
-      
-      var addSelectors = function(ul){
-        var ulTag = ul[0].tagName;
-        ul.hasClass(_this.ulClass) || ul.addClass(_this.ulClass);
-        ul.children("li").each(function(){
-          var li = $(this);
-          li.hasClass(_this.liClass) || li.addClass(_this.liClass);
-          li.children(ulTag).each(function(){
-            addSelectors($(this));
-          });
+  Plugin.prototype.init = function(){
+    this.isHandle = false;
+    this.isValid = true;
+    this.mouseStart = {x: 0, y: 0};
+    this.offsetStart = {left: 0, top: 0};
+    this.fixIndex = 0;
+    var that = this;
+    
+    function addSelectors(ul) {
+      var ulTag = ul[0].tagName;
+      ul.hasClass(that.ulClass) || ul.addClass(that.ulClass);
+      ul.children("li").each(function(){
+        var li = $(this);
+        li.hasClass(that.liClass) || li.addClass(that.liClass);
+        li.children(ulTag).each(function(){
+          addSelectors($(this));
         });
-      };
+      });
+    }
 
-      addSelectors(this.el);
+    function onDragStart(e) {
+      that.dragStart(e);
+    }
 
-      var onDragStart = function(e){
-        _this.dragStart(e);
-      };
+    function onMove(e) {
+      that.move(e);
+    }
 
-      var onMove = function(e){
-        _this.move(e);
-      };
+    function onDrop(e) {
+      that.drop(e);
+    }
 
-      var onDrop = function(e){
-        _this.drop(e);
-      };
+    addSelectors(this.el);
+    
+    this.el.find(this.options.liSelector).mousedown(onDragStart);
+    $(window).mouseup(onDrop).mousemove(onMove);
+  };
 
-      this.el.find(this.options.liSelector).mousedown(onDragStart);
-      $(window).mouseup(onDrop).mousemove(onMove);
-    },
+  Plugin.prototype.dragStart = function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    this.reset();
+    this.dragEl = $(e.target).closest(this.options.liSelector);
+    this.firstStyle = this.dragEl.attr("style") || "";
+    this.dragEl.css({"position": "absolute", "opacity": this.options.opacity, "z-index": "-1"});
+    this.isHandle = true;
+    this.mouseStart = {x: e.pageX, y: e.pageY};
+    this.offsetStart = this.dragEl.offset();
+    this.index = this.oldIndex = this.dragEl.index();
+    this.parent = this.oldParent = this.dragEl.closest(this.options.ulSelector);
+    this.attachPlaceHolder(this.index, this.parent, this.dragEl.outerHeight());
 
-    dragStart: function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      this.reset();
-      this.dragEl = $(e.target).closest(this.options.liSelector);
-      this.firstStyle = this.dragEl.attr("style") || "";
-      this.dragEl.css({"position": "absolute", "opacity": this.options.opacity, "z-index": "-1"});
-      this.isHandle = true;
-      this.mouseStart = {x: e.pageX, y: e.pageY};
-      this.offsetStart = this.dragEl.offset();
-      this.index = this.oldIndex = this.dragEl.index();
-      this.parent = this.oldParent = this.dragEl.closest(this.options.ulSelector);
-      this.attachPlaceHolder(this.index, this.parent, this.dragEl.outerHeight());
+    this.dragEl.offset(this.offsetStart);
 
-      this.dragEl.offset(this.offsetStart);
+    this.el.trigger("drag", {element: this.dragEl, parent: this.parent, index: this.index});
+  };
 
-      this.el.trigger("drag", {element: this.dragEl, parent: this.parent, index: this.index});
-    },
+  Plugin.prototype.attachPlaceHolder = function(index, parent, height){
+    if (!this.placeholder)
+      this.placeholder = $("<div>").css({
+        "height": height + "px"
+      }).addClass(this.placeHolderClass);
+    else if (height !== null)
+      this.placeholder.css("height", height);
 
-    attachPlaceHolder: function(index, parent, height){
-      if(this.placeholder == null)
-        this.placeholder = $("<div>").css({
-          "height": height + "px"
-        }).addClass(this.placeHolderClass);
-      else if (height != null)
-        this.placeholder.css("height", height);
+    if (index === 0)
+      parent.prepend(this.placeholder);
+    else
+      parent.children(this.options.liSelector + ":nth-child(" + index + ")").after(this.placeholder);
 
-      if(index === 0)
-        parent.prepend(this.placeholder);
-      else
-        parent.children(this.options.liSelector + ":nth-child(" + index + ")").after(this.placeholder);
+    this.index = index;
+    this.parent = parent;
+  };
 
-      this.index = index;
-      this.parent = parent;
-    },
+  Plugin.prototype.move = function(e){
+    if (!this.isHandle)
+      return;
 
-    move: function(e){
-      if(!this.isHandle)
-        return;
+    var diffX = e.pageX - this.mouseStart.x;
+    var diffY = e.pageY - this.mouseStart.y;
+    var offset = {
+      left: this.offsetStart.left + diffX,
+      top: this.offsetStart.top + diffY
+    };
+    this.dragEl.offset(offset);
+    e.preventDefault();
 
-      var diffX = e.pageX - this.mouseStart.x;
-      var diffY = e.pageY - this.mouseStart.y;
-      var offset = {
-        left: this.offsetStart.left + diffX,
-        top: this.offsetStart.top + diffY
-      };
-      this.dragEl.offset(offset);
-      e.preventDefault();
+    var hoverEl = $(window.document.elementFromPoint(e.pageX, e.pageY)).closest(this.options.ulSelector + "," + this.options.liSelector + "," + this.placeHolerSelector);
+    var hoverIndex = hoverEl.index();
+    var hoverParent = hoverEl.closest(this.options.ulSelector);
+    var isNesting = this.nestle(hoverEl, hoverIndex, hoverParent);
 
-      var hoverEl = $(document.elementFromPoint(e.pageX, e.pageY)).closest(this.options.ulSelector + "," + this.options.liSelector + "," + this.placeHolerSelector);
-      var hoverIndex = hoverEl.index();
-      var hoverParent = hoverEl.closest(this.options.ulSelector);
-      var isNesting = this.nestle(hoverEl, hoverIndex, hoverParent);
+    if (isNesting){
+      hoverIndex = isNesting.hoverIndex;
+      hoverParent = isNesting.hoverParent;
+    }
 
-      if(isNesting){
-        hoverIndex = isNesting.hoverIndex;
-        hoverParent = isNesting.hoverParent;
-      }
+    if (hoverEl.length === 0 || hoverEl[0] == this.dragEl[0] || //Not Valid
+      (hoverIndex == this.index && hoverParent[0] == this.parent[0])) //Not Modified
+      return;
 
-      if(hoverEl.length === 0 || hoverEl[0] == this.dragEl[0] || //Not Valid
-        (hoverIndex == this.index && hoverParent[0] == this.parent[0])) //Not Modified
-        return;
+    this.placeholder.detach();
+    this.attachPlaceHolder(hoverIndex, hoverParent);
 
-      this.placeholder.detach();
-      this.attachPlaceHolder(hoverIndex, hoverParent);
+    this.fixIndex = hoverParent[0] == this.oldParent[0] && hoverIndex > this.oldIndex ? 1 : 0; //Fix diff index caused by placeholder element
 
-      this.fixIndex = hoverParent[0] == this.oldParent[0] && hoverIndex > this.oldIndex ? 1 : 0; //Fix diff index caused by placeholder element
+    var retObj = {
+      element: this.dragEl,
+      parent: this.parent,
+      index: this.index - this.fixIndex
+    };
 
-      var retObj = {
-        element: this.dragEl,
-        parent: this.parent,
-        index: this.index - this.fixIndex
-      };
-
-      if(this.options.isAllowed(retObj)){
-        this.el.trigger("move", retObj);
-        this.placeholder.removeClass(this.placeHolderErrorClass);
-        this.isValid = true;
-      }else{
-        this.placeholder.addClass(this.placeHolderErrorClass);
-        this.isValid = false;
-      }
-    },
-
-    nestle: function(hoverEl, hoverIndex, hoverParent){
-      if(hoverEl.hasClass(this.placeHolderClass)){
-        if(hoverIndex > 0){ //Nestle
-          var aboveEl = hoverParent.children(this.options.liSelector + ":nth-child(" + hoverIndex + ")");
-          if(aboveEl.length > 0 && this.dragEl.offset().left - aboveEl.offset().left > this.options.nestleSize){
-            var aboveGroup = aboveEl.children(this.options.ulSelector).first();
-            if(aboveGroup.length !== 0 && aboveGroup.children(this.options.liSelector).length === 0){
-              return {
-                hoverParent: aboveGroup,
-                hoverIndex: 0
-              };
-            }
-          }
-        }else if(hoverParent.children(this.options.liSelector).length === 0 && this.dragEl.offset().left - hoverParent.closest(this.options.liSelector).offset().left <= this.options.nestleSize){ //Leave nestle
-          var el = hoverParent.closest(this.options.liSelector);
-          return {
-            hoverParent: el,
-            hoverIndex: el.index()
-          };
-        }
-      }
-      return false;
-    },
-
-    drop: function(){
-      this.detachPlaceholder();
-      this.index -= this.fixIndex;
-      if((this.parent[0] != this.oldParent[0] || this.index != this.oldIndex) && this.isValid)
-        this.el.trigger("drop", {element: this.dragEl, newParent: this.parent, newIndex: this.index, oldParent: this.oldParent, oldIndex: this.oldIndex});
-      this.reset();
-    },
-
-    reset: function(){
-      this.isHandle = false;
+    if (this.options.isAllowed(retObj)){
+      this.el.trigger("move", retObj);
+      this.placeholder.removeClass(this.placeHolderErrorClass);
       this.isValid = true;
-      this.fixIndex = 0;
-
-      if(this.dragEl){
-        this.dragEl.attr("style", this.firstStyle);
-        this.dragEl = null;
-      }
-      this.detachPlaceholder();
-    },
-
-    detachPlaceholder: function(){
-      if(this.placeholder){
-        this.placeholder.detach();
-        this.placeholder.removeClass(this.placeHolderErrorClass);
-      }
+    }else{
+      this.placeholder.addClass(this.placeHolderErrorClass);
+      this.isValid = false;
     }
   };
 
-  $.fn.eNestedSortable = function(options){
-    return this.each(function(){
-      new Plugin(this, options);
+  Plugin.prototype.nestle = function(hoverEl, hoverIndex, hoverParent){
+    if (hoverEl.hasClass(this.placeHolderClass)){
+      if (hoverIndex > 0){ //Nestle
+        var aboveEl = hoverParent.children(this.options.liSelector + ":nth-child(" + hoverIndex + ")");
+        if (aboveEl.length > 0 && this.dragEl.offset().left - aboveEl.offset().left > this.options.nestleSize){
+          var aboveGroup = aboveEl.children(this.options.ulSelector).first();
+          if (aboveGroup.length !== 0 && aboveGroup.children(this.options.liSelector).length === 0){
+            return {
+              hoverParent: aboveGroup,
+              hoverIndex: 0
+            };
+          }
+        }
+      }else if (hoverParent.children(this.options.liSelector).length === 0 && this.dragEl.offset().left - hoverParent.closest(this.options.liSelector).offset().left <= this.options.nestleSize){ //Leave nestle
+        var el = hoverParent.closest(this.options.liSelector);
+        return {
+          hoverParent: el,
+          hoverIndex: el.index()
+        };
+      }
+    }
+    return false;
+  };
+
+  Plugin.prototype.drop = function(){
+    this.detachPlaceholder();
+    this.index -= this.fixIndex;
+    if ((this.parent[0] != this.oldParent[0] || this.index != this.oldIndex) && this.isValid)
+      this.el.trigger("drop", {element: this.dragEl, newParent: this.parent, newIndex: this.index, oldParent: this.oldParent, oldIndex: this.oldIndex});
+    this.reset();
+  };
+
+  Plugin.prototype.reset = function(){
+    this.isHandle = false;
+    this.isValid = true;
+    this.fixIndex = 0;
+
+    if (this.dragEl){
+      this.dragEl.attr("style", this.firstStyle);
+      this.dragEl = null;
+    }
+    this.detachPlaceholder();
+  };
+
+  Plugin.prototype.detachPlaceholder = function(){
+    if (this.placeholder){
+      this.placeholder.detach();
+      this.placeholder.removeClass(this.placeHolderErrorClass);
+    }
+  };
+
+  // PLUGIN DEFINITION
+  // ===========================
+
+  var old = $.fn.eNestedSortable;
+
+  $.fn.eNestedSortable = function(option, params) {
+    return this.each(function() {
+      var $this = $(this);
+      var data = $this.data('eNestedSortable');
+      var options = typeof option == 'object' && option;
+
+      if (!data) $this.data('eNestedSortable', (data = new Plugin(this, options)));
+      if (typeof option == 'string') data[option].apply(data, Array.prototype.slice.call(arguments, 1));
     });
+  };
+
+  $.fn.eNestedSortable.Constructor = Plugin;
+
+
+  // eNestedSortable NO CONFLICT
+  // =====================
+
+  $.fn.eNestedSortable.noConflict = function() {
+    $.fn.eNestedSortable = old;
+    return this;
   };
 
 }(jQuery));
