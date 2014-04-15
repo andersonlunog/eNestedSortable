@@ -72,6 +72,10 @@ This is the style of placeholder element. Can be changed if need.
   <dd>Opacity applied to the dragged element. Default is "0.5".</dd>
   <dt>nestleSize</dt>
   <dd>The distance to the element to be nested. Default is 40.</dd>
+  <dt>ulSelector</dt>
+  <dd>Selector to list element (`ul` or `ol`). Default is ".e-nested-sortable-ul".</dd>  
+  <dt>liSelector</dt>
+  <dd>Selector to list item element (`li`). Default is ".e-nested-sortable-li".</dd>
   <dt>isAllowed</dt>
   <dd>The function called when a element is dragged. If it returns false, the `drop` event is not challed and the class `e-nested-sortable-placeholder-error` is added to the placeholder element.
     <br>
