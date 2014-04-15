@@ -1,6 +1,6 @@
 /*
  * jQuery Evented Nested Sortable
- * v 0.0.2 / 2014-04-11
+ * v 0.0.3 / 2014-04-11
  * https://github.com/andersonlevita/eNestedSortable
  *
  * Copyright (c) 2014-2014 Anderson Nogueira
@@ -72,7 +72,7 @@
     dragStart: function(e){
       e.preventDefault();
       e.stopPropagation();
-      this.cancel();
+      this.reset();
       this.dragEl = $(e.target);
       this.firstStyle = this.dragEl.attr("style") || "";
       this.dragEl.css({"position": "absolute", "opacity": this.options.opacity, "z-index": "-1"});
@@ -178,13 +178,14 @@
     },
 
     drop: function(){
-      this.cancel();
+      this.detachPlaceholder();
       this.index -= this.fixIndex;
       if((this.parent[0] != this.oldParent[0] || this.index != this.oldIndex) && this.isValid)
         this.el.trigger("drop", {element: this.dragEl, newParent: this.parent, newIndex: this.index, oldParent: this.oldParent, oldIndex: this.oldIndex});
+      this.reset();
     },
 
-    cancel: function(){
+    reset: function(){
       this.isHandle = false;
       this.isValid = true;
       this.fixIndex = 0;
@@ -193,6 +194,10 @@
         this.dragEl.attr("style", this.firstStyle);
         this.dragEl = null;
       }
+      this.detachPlaceholder();
+    },
+
+    detachPlaceholder: function(){
       if(this.placeholder){
         this.placeholder.detach();
         this.placeholder.removeClass(this.placeHolderErrorClass);
