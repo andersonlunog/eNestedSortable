@@ -1,6 +1,6 @@
 /*
  * jQuery Evented Nested Sortable
- * v 0.0.5 / 2014-04-11
+ * v 0.0.6 / 2014-04-15
  * https://github.com/andersonlevita/eNestedSortable
  *
  * Copyright (c) 2014-2014 Anderson Nogueira
@@ -63,7 +63,7 @@
     if(this.options.ulSelector == defaults.ulSelector || this.options.liSelector == defaults.liSelector)
       addSelectors(this.el);
     
-    this.el.find(this.options.liSelector).mousedown(onDragStart);
+    this.el.on("mousedown", this.options.liSelector, onDragStart);
     $(window).mouseup(onDrop).mousemove(onMove);
   };
 

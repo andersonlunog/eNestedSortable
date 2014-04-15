@@ -92,7 +92,7 @@ This is the style of placeholder element. Can be changed if need.
 
 ## Requirements
 
-jQuery 1.4+
+jQuery 1.7+
 
 ## Notes
 
