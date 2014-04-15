@@ -51,7 +51,8 @@
         });
       };
 
-      addSelectors(this.el);
+      if(this.options.ulSelector == defaults.ulSelector || this.options.liSelector == defaults.liSelector)
+        addSelectors(this.el);
 
       var onDragStart = function(e){
         _this.dragStart(e);
