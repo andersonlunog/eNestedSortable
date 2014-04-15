@@ -160,7 +160,7 @@
           var aboveEl = hoverParent.children(this.options.liSelector + ":nth-child(" + hoverIndex + ")");
           if(aboveEl.length > 0 && this.dragEl.offset().left - aboveEl.offset().left > this.options.nestleSize){
             var aboveGroup = aboveEl.children(this.options.ulSelector).first();
-            if(aboveGroup.length !== 0 && aboveGroup.children(this.options.liSelector).length === 0){
+            if(aboveGroup.length !== 0 && aboveGroup.is(":visible") && aboveGroup.children(this.options.liSelector).length === 0){
               return {
                 hoverParent: aboveGroup,
                 hoverIndex: 0
