@@ -96,7 +96,7 @@ jQuery 1.4+
 
 ## Notes
 
-* If the list is created dynamically, the `ul` or `ol` should have the class `e-nested-sortable-ul` and the `li`, the class `e-nested-sortable-li`.
+* If the list is created dynamically, the `ul` or `ol` should have the class `e-nested-sortable-ul` and the `li`, the class `e-nested-sortable-li`. Or the options `ulSelector` and `liSelector` should be changed.
 
 ## Examples
 
