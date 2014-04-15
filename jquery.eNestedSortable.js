@@ -1,6 +1,6 @@
 /*
  * jQuery Evented Nested Sortable
- * v 0.0.1 / 2014-04-11
+ * v 0.0.2 / 2014-04-11
  * https://github.com/andersonlevita/eNestedSortable
  *
  * Copyright (c) 2014-2014 Anderson Nogueira
