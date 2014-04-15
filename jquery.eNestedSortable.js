@@ -189,8 +189,10 @@
       this.isValid = true;
       this.fixIndex = 0;
 
-      if(this.dragEl)
+      if(this.dragEl){
         this.dragEl.attr("style", this.firstStyle);
+        this.dragEl = null;
+      }
       if(this.placeholder){
         this.placeholder.detach();
         this.placeholder.removeClass(this.placeHolderErrorClass);
