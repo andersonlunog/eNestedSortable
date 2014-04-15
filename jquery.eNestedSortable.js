@@ -202,27 +202,27 @@
     }
   };
 
-  // PLUGIN DEFINITION
-  // ===========================
+  // Plugin definition
+  // =================
 
   var old = $.fn.eNestedSortable;
 
   $.fn.eNestedSortable = function(option, params) {
     return this.each(function() {
       var $this = $(this);
-      var data = $this.data('eNestedSortable');
+      var plugin = $this.data('eNestedSortable');
       var options = typeof option == 'object' && option;
 
-      if (!data) $this.data('eNestedSortable', (data = new Plugin(this, options)));
-      if (typeof option == 'string') data[option].apply(data, Array.prototype.slice.call(arguments, 1));
+      if (!plugin) $this.data('eNestedSortable', (plugin = new Plugin(this, options)));
+      if (typeof option == 'string') plugin[option].apply(plugin, Array.prototype.slice.call(arguments, 1));
     });
   };
 
   $.fn.eNestedSortable.Constructor = Plugin;
 
 
-  // eNestedSortable NO CONFLICT
-  // =====================
+  // eNestedSortable no conflict
+  // ===========================
 
   $.fn.eNestedSortable.noConflict = function() {
     $.fn.eNestedSortable = old;
