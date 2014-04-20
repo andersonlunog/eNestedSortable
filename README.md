@@ -97,6 +97,7 @@ jQuery 1.7+
 ## Notes
 
 * If the list is created dynamically, the `ul` or `ol` should have the class `e-nested-sortable-ul` and the `li`, the class `e-nested-sortable-li`. Or the options `ulSelector` and `liSelector` should be changed.
+* For a list item (`li`) accepts nested children, should have a visible list (`ul`/`ol`) as a child.
 
 ## Examples
 
